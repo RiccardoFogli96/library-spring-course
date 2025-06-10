@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,11 +44,14 @@ class MagazineControllerTest {
 	MagazineController magazineController;
 
 	CreateMagazineDTO createMagazineDTO;
+	CreateMagazineDTO createMagazineDTONOK;
 	List<Long> authorIds = new ArrayList <>();
+	List<Long> authorIdsNOK = new ArrayList <>();
 
 	@BeforeEach
 	void setUp() {
 		authorIds = Arrays.asList(0L,1L,2L);
+		authorIdsNOK = Arrays.asList(0L,1L,2L,3L);
 
 		createMagazineDTO = CreateMagazineDTO.builder()
 				.title("MagazineTest")
@@ -55,6 +59,14 @@ class MagazineControllerTest {
 				.publishedDate(LocalDate.now())
 				.numberMagazine(0)
 				.authorIdList(authorIds)
+				.build();
+
+		createMagazineDTONOK = CreateMagazineDTO.builder()
+				.title("MagazineTest")
+				.tipologyMagazine(TipologyMagazine.MONTHLY)
+				.publishedDate(LocalDate.now())
+				.numberMagazine(0)
+				.authorIdList(authorIdsNOK)
 				.build();
 	}
 
@@ -67,4 +79,23 @@ class MagazineControllerTest {
 		result.getResponse().getContentAsString();
 
 	}
+
+	@Test
+	void getListAuthor_WhenHaveDivergenceAuthor() throws Exception {
+
+		MvcResult result = mockMvc.perform(get("/magazine").content(objectMapper.writeValueAsString(createMagazineDTO)).contentType(MediaType.APPLICATION_JSON))
+				.andReturn();
+
+		result.getResponse().getContentAsString();
+	}
+
+	@Test
+	void addNewMagazine_EverythingOk() throws Exception {
+
+		MvcResult result = mockMvc.perform(post("/magazine").content(objectMapper.writeValueAsString(createMagazineDTO)).contentType(MediaType.APPLICATION_JSON))
+				.andReturn();
+
+		result.getResponse().getContentAsString();
+	}
+
 }
